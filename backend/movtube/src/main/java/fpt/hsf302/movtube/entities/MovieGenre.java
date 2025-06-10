@@ -11,9 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Table(name = "movie_genres")
 public class MovieGenre {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @EmbeddedId
+    private MovieGenreId id;
 
     @MapsId("movieId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
