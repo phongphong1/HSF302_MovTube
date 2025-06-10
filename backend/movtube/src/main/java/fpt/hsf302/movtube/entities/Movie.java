@@ -25,12 +25,12 @@ public class Movie {
     @Column(name = "original_name")
     private String originalName;
 
-    @Column(name = "\"year\"")
+    @Column(name = "year")
     private Integer year;
 
     @Nationalized
     @Lob
-    @Column(name = "synopsis")
+    @Column(name = "synopsis", columnDefinition = "NTEXT")
     private String synopsis;
 
     @Column(name = "duration_minutes")
