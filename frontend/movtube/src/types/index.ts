@@ -1,20 +1,19 @@
 export interface Movie {
-  id: string;
+  id: number;
   title: string;
-  image: string;
-  poster?: string;
-  backdrop?: string;
-  rating: number;
+  originalName?: string; 
   year: number;
-  releaseDate?: string;
-  genres: string[];
-  duration: string;
-  director?: string;
-  writers?: string[];
-  stars?: string[];
-  plot?: string;
-  trailer?: string;
-  similar?: string[];
+  synopsis?: string;
+  durationMinutes: number;
+  posterUrl: string;
+  averageRating: number;
+  totalEpisodes: number;
+  genres?: Genre[];
+}
+
+export interface Genre {
+  id: number;
+  name: string;
 }
 
 export interface MovieCardProps {
