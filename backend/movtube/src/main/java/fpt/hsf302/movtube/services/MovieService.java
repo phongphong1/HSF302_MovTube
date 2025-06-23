@@ -73,7 +73,7 @@ public class MovieService {
                                               Integer page,
                                               Integer size) {
         Pageable pageable;
-        if (sortBy != null){
+        if (sortBy != null && !sortBy.isBlank()) {
             pageable = PageRequest.of(page, size, Sort.by(sortBy, sortDirection));
         }else{
             pageable = PageRequest.of(page, size);
@@ -85,7 +85,7 @@ public class MovieService {
 
         Page<Movie> movies = movieRepository.getMoviesWithFilters(query, genre, fromYear, toYear, minRating, pageable);
         Pagination pagination = new Pagination();
-        pagination.setCurrentPage(page + 1);
+        pagination.setCurrentPage(page);
         pagination.setTotalPages(movies.getTotalPages());
         pagination.setItemsPerPage(size);
         pagination.setTotalItems((int)movies.getTotalElements());

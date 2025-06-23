@@ -41,7 +41,8 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
   ];
 
   const sortOptions = [
-    { value: "rating", label: "Điểm đánh giá" },
+    { value: "", label: "Mặc định" },
+    { value: "averageRating", label: "Đánh giá" },
     { value: "year", label: "Năm phát hành" },
     { value: "title", label: "Tiêu đề" },
   ];
@@ -52,10 +53,10 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
   ];
 
   const itemsPerPageOptions = [
-    { value: "12", label: "12 phim" },
-    { value: "24", label: "24 phim" },
-    { value: "48", label: "48 phim" },
-    { value: "96", label: "96 phim" },
+    { value: "15", label: "15 phim" },
+    { value: "30", label: "30 phim" },
+    { value: "45", label: "45 phim" },
+    { value: "60", label: "60 phim" },
   ];
 
   // Handle local filter changes
@@ -76,10 +77,10 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
       yearFrom: oldestYear,
       yearTo: currentYear,
       selectedGenre: "",
-      sortBy: "rating",
+      sortBy: "",
       sortDirection: "desc",
       itemsPerPage: 12,
-      currentPage: 1,
+      currentPage: 0,
     };
     setLocalFilters(defaultFilters);
     // Thực hiện submit luôn sau khi reset
@@ -152,9 +153,8 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
                 handleLocalFilterChange({ minRating: value })
               }
               label="Điểm đánh giá tối thiểu"
-            />
-
-            <div className="grid grid-cols-2 gap-2">
+            />{" "}
+            <div className="grid grid-cols-1 gap-2">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Năm phát hành

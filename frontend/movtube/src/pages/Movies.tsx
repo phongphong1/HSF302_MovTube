@@ -1,6 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import type { FilterOptions, Movie } from "../types";
-import { allMovies, allGenres } from "../data/moviesData";
+import { allGenres } from "../data/moviesData";
 import MovieGrid from "../components/movies/MovieGrid";
 import MovieFilters from "../components/movies/MovieFilters";
 import Pagination from "../components/ui/Pagination";
@@ -9,14 +15,18 @@ import LoadingState from "../components/ui/LoadingState";
 const Movies: React.FC = () => {
   // Current year for range defaults
   const currentYear = new Date().getFullYear();
-
   // Create genres array in the format expected by the new component
-  const genresFormatted = allGenres
-    .filter((genre) => genre) // Filter out any undefined values
-    .map((genre, index) => ({
-      id: index + 1,
-      name: String(genre), // Convert to string safely
-    }));
+  // Use useMemo to prevent recreation of this array on each render
+  const genresFormatted = useMemo(
+    () =>
+      allGenres
+        .filter((genre) => genre) // Filter out any undefined values
+        .map((genre, index) => ({
+          id: index + 1,
+          name: String(genre), // Convert to string safely
+        })),
+    [] // Empty dependency array means this only runs once
+  );
 
   // State for loading and filtered movies
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +49,8 @@ const Movies: React.FC = () => {
     },
   });
 
+  const API_URL = `${import.meta.env.VITE_API_URL}/movies`;
+
   // State for all filters
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
@@ -46,39 +58,59 @@ const Movies: React.FC = () => {
     yearFrom: 1900,
     yearTo: currentYear,
     selectedGenre: "",
-    sortBy: null,
-    sortDirection: null,
+    sortBy: "",
+    sortDirection: "desc",
     itemsPerPage: 12,
     currentPage: 1,
   });
-
   // Function to fetch movies from API with pagination handled by the backend
   const fetchMovies = useCallback(
     async (filterOptions: FilterOptions) => {
       setIsLoading(true);
 
       try {
-        // This would be an API call in a real implementation
-        // For now, we'll simulate a network request with a delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        // Simulate API call with filters and pagination
+        const response = await fetch(
+          `${API_URL}/search?query=${encodeURIComponent(
+            filterOptions.searchTerm
+          )}&minRating=${filterOptions.minRating}&fromYear=${
+            filterOptions.yearFrom
+          }&toYear=${filterOptions.yearTo}&genreId=${
+            filterOptions.selectedGenre
+          }&sortBy=${filterOptions.sortBy}&sortDirection=${
+            filterOptions.sortDirection
+          }&size=${filterOptions.itemsPerPage}&page=${
+            filterOptions.currentPage
+          }`
+        );
 
-        // Mô phỏng API call với phân trang ở backend
-        // Trong thực tế, đây sẽ là một fetch/axios call đến API của bạn
-        // API sẽ trả về cả dữ liệu phim đã phân trang và metadata phân trang
+        if (!response.ok) {
+          throw new Error("Failed to fetch movies");
+        }
+
+        const data = await response.json();
+
+        console.log("Fetched movies:", data);
+        // Update state with fetched movies and pagination info
+        setFilteredMoviesData(data);
       } catch (error) {
         console.error("Error fetching movies:", error);
-        // Trong thực tế, bạn có thể muốn set một state error
       } finally {
         setIsLoading(false);
       }
     },
-    [genresFormatted]
+    [] // Loại bỏ genresFormatted từ dependencies vì nó không được sử dụng trong hàm
   );
+  // Initial fetch on component mount - sử dụng useRef để đảm bảo chỉ fetch một lần
+  const isInitialMount = useRef(true);
 
-  // Initial fetch on component mount
   useEffect(() => {
-    fetchMovies(filters);
-  }, [fetchMovies]);
+    // Chỉ fetch data khi component được mount lần đầu
+    if (isInitialMount.current) {
+      fetchMovies(filters);
+      isInitialMount.current = false;
+    }
+  }, [fetchMovies, filters]);
 
   // Handle form submission - this is where we would call the API
   const handleFilterSubmit = useCallback(

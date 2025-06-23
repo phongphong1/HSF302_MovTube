@@ -31,7 +31,7 @@ export interface MovieCardProps {
   movie: Movie;
 }
 
-export type SortOption = "averageRating" | "year" | "title" | null;
+export type SortOption = "averageRating" | "year" | "title" | "";
 export type SortDirection = "asc" | "desc";
 
 export interface FilterOptions {
