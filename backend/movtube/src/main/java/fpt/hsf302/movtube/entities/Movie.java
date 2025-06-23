@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -44,5 +46,11 @@ public class Movie {
 
     @Column(name = "total_episodes")
     private Integer totalEpisodes;
+
+    @ManyToMany
+    @JoinTable(name = "movie_genres",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private Set<Genre> genres = new LinkedHashSet<>();
 
 }

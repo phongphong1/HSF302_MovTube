@@ -1,44 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useMovies } from "../hooks/useMovies";
-import type { Movie } from "../types";
+import MovieCard from "../components/movies/MovieCard";
+import LoadingState from "../components/ui/LoadingState";
+import ErrorState from "../components/ui/ErrorState";
 import heroImage from "../assets/hero.jpg";
-
-// MovieCard component
-const MovieCard: React.FC<{
-  movie: Movie;
-}> = ({ movie }) => {
-  return (
-    <Link to={`/movies/${movie.id}`} className="group">
-      <div className="relative rounded-lg overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
-        <img
-          src={movie.posterUrl}
-          alt={movie.title}
-          className="w-full h-[350px] object-cover"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-          <h3 className="text-white font-bold text-lg">{movie.title}</h3>
-          {movie.originalName && (
-            <p className="text-gray-400 text-sm">{movie.originalName}</p>
-          )}
-          <div className="flex items-center justify-between mt-1">
-            <div className="flex items-center">
-              <span className="text-yellow-400 font-medium">
-                ★ {movie.averageRating.toFixed(1)}
-              </span>
-              {movie.totalEpisodes > 1 && (
-                <span className="text-gray-300 text-xs ml-2">
-                  {movie.totalEpisodes} tập
-                </span>
-              )}
-            </div>
-            <span className="text-gray-300 text-sm">{movie.year}</span>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-};
 
 const Home: React.FC = () => {
   // Using the useMovies hook to fetch data
@@ -81,29 +47,16 @@ const Home: React.FC = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-          </div>
+          <LoadingState />
         ) : error ? (
-          <div className="text-center py-10 text-red-400 bg-red-900/20 rounded-lg p-4 border border-red-700">
-            <h3 className="text-xl font-semibold mb-2">
-              Đã xảy ra lỗi khi tải dữ liệu phim
-            </h3>
-            <p className="mb-2">Chi tiết lỗi:</p>
-            <pre className="text-sm bg-red-900/30 p-3 rounded overflow-auto max-h-32 whitespace-pre-wrap">
-              {error.message}
-            </pre>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-            >
-              Thử lại
-            </button>
-          </div>
+          <ErrorState
+            message={error.message}
+            onRetry={() => window.location.reload()}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {featuredMovies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
+              <MovieCard key={movie.id} movie={movie} variant="simple" />
             ))}
           </div>
         )}
@@ -118,29 +71,16 @@ const Home: React.FC = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-          </div>
+          <LoadingState />
         ) : error ? (
-          <div className="text-center py-10 text-red-400 bg-red-900/20 rounded-lg p-4 border border-red-700">
-            <h3 className="text-xl font-semibold mb-2">
-              Đã xảy ra lỗi khi tải dữ liệu phim
-            </h3>
-            <p className="mb-2">Chi tiết lỗi:</p>
-            <pre className="text-sm bg-red-900/30 p-3 rounded overflow-auto max-h-32 whitespace-pre-wrap">
-              {error.message}
-            </pre>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-            >
-              Thử lại
-            </button>
-          </div>
+          <ErrorState
+            message={error.message}
+            onRetry={() => window.location.reload()}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {newMovies.slice(0, 3).map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
+              <MovieCard key={movie.id} movie={movie} variant="simple" />
             ))}
             <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-purple-600 to-blue-700 flex flex-col items-center justify-center p-6 text-center h-[350px]">
               <h3 className="text-3xl font-bold mb-4">Khám phá thêm?</h3>

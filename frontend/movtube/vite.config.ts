@@ -8,14 +8,13 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  // Cấu hình proxy để tránh lỗi CORS khi gọi API từ frontend
   server: {
     proxy: {
-      // Proxy API requests to avoid CORS issues during development
       '/api': {
-        target: 'http://localhost:8080/api',
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
+      }
+    }
+  }
 })

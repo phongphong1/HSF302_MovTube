@@ -1,21 +1,72 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import type { MovieCardProps } from "../../types";
+import type { Movie } from "../../types";
+import {
+  getMovieRating,
+  getMoviePosterUrl,
+  formatDuration,
+} from "../../utils/movieUtils";
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+interface MovieCardProps {
+  movie: Movie;
+  variant?: "detailed" | "simple";
+}
+
+const MovieCard: React.FC<MovieCardProps> = ({
+  movie,
+  variant = "detailed",
+}) => {
+  // Handle possible undefined values safely using utility functions
+  const rating = getMovieRating(movie);
+  const imageUrl = getMoviePosterUrl(movie);
+  const genres = movie.genres || [];
+
+  if (variant === "simple") {
+    return (
+      <Link to={`/movies/${movie.id}`} className="group">
+        <div className="relative rounded-lg overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
+          <img
+            src={imageUrl}
+            alt={movie.title}
+            className="w-full h-[350px] object-cover"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+            <h3 className="text-white font-bold text-lg">{movie.title}</h3>
+            {movie.originalName && (
+              <p className="text-gray-400 text-sm">{movie.originalName}</p>
+            )}
+            <div className="flex items-center justify-between mt-1">
+              <div className="flex items-center">
+                <span className="text-yellow-400 font-medium">
+                  ★ {rating.toFixed(1)}
+                </span>
+                {movie.totalEpisodes && movie.totalEpisodes > 1 && (
+                  <span className="text-gray-300 text-xs ml-2">
+                    {movie.totalEpisodes} tập
+                  </span>
+                )}
+              </div>
+              <span className="text-gray-300 text-sm">{movie.year}</span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <Link to={`/movies/${movie.id}`} className="group">
       <div className="relative rounded-lg overflow-hidden shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl bg-gray-800">
         <div className="aspect-[2/3] overflow-hidden">
           <img
-            src={movie.image}
+            src={imageUrl}
             alt={movie.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
         <div className="absolute top-2 right-2">
           <span className="bg-black bg-opacity-70 text-yellow-400 text-sm font-bold px-2 py-1 rounded-md">
-            ★ {movie.rating}
+            ★ {rating.toFixed(1)}
           </span>
         </div>
         <div className="p-4">
@@ -24,23 +75,30 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
           </h3>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-300">{movie.year}</span>
-            <span className="text-gray-300">{movie.duration}</span>
+            <span className="text-gray-300">
+              {movie.duration ||
+                (movie.durationMinutes
+                  ? formatDuration(movie.durationMinutes)
+                  : "")}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-1">
-            {movie.genres.slice(0, 2).map((genre, index) => (
-              <span
-                key={index}
-                className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded"
-              >
-                {genre}
-              </span>
-            ))}
-            {movie.genres.length > 2 && (
-              <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded">
-                +{movie.genres.length - 2}
-              </span>
-            )}
-          </div>
+          {Array.isArray(genres) && genres.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {genres.slice(0, 2).map((genre, index) => (
+                <span
+                  key={index}
+                  className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded"
+                >
+                  {typeof genre === "string" ? genre : genre?.name}
+                </span>
+              ))}
+              {genres.length > 2 && (
+                <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded">
+                  +{genres.length - 2}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>

@@ -2,24 +2,26 @@ package fpt.hsf302.movtube.controller;
 
 
 import fpt.hsf302.movtube.dtos.HomeMovieDTO;
+import fpt.hsf302.movtube.dtos.MoviesWithPaginationDTO;
 import fpt.hsf302.movtube.entities.Genre;
 import fpt.hsf302.movtube.entities.Movie;
 import fpt.hsf302.movtube.entities.MovieGenre;
 import fpt.hsf302.movtube.repositories.MovieGenreRepository;
 import fpt.hsf302.movtube.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/movies")
+@CrossOrigin(origins = "*")
 public class MovieController {
 
     private MovieService movieService;
 
+    @Autowired
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
     }
@@ -32,5 +34,33 @@ public class MovieController {
         homeMovieDTO.setNewMovies(movieService.getNewMovies());
         homeMovieDTO.setGenres(movieService.getAllGenres());
         return homeMovieDTO;
+    }
+
+    @GetMapping("/search")
+    public MoviesWithPaginationDTO getMoviesWithFilters(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer fromYear,
+            @RequestParam(required = false) Integer toYear,
+            @RequestParam(required = false) BigDecimal minRating,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDirection,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "12") Integer size) {
+
+
+        MoviesWithPaginationDTO moviesWithPaginationDTO = movieService.getAllMoviesWithFilter(
+                query,
+                genreId,
+                fromYear,
+                toYear,
+                minRating,
+                sortBy,
+                sortDirection,
+                page,
+                size
+        );
+
+        return moviesWithPaginationDTO;
     }
 }

@@ -12,7 +12,7 @@ interface UseMoviesReturn {
 
 
 // API URL using Vite's development proxy to avoid CORS issues
-const API_URL = '/api/movies';
+const API_URL = `${import.meta.env.VITE_API_URL}/movies`;
 
 /**
  * Custom hook to fetch movie data

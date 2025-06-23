@@ -1,11 +1,21 @@
-# React + TypeScript + Vite
+# MovTube - Trang web xem phim trực tuyến
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website xem phim trực tuyến MovTube được xây dựng bằng React + TypeScript + Vite + Tailwind CSS.
 
-Currently, two official plugins are available:
+## Tính năng chính
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Hiển thị danh sách phim nổi bật và phim mới
+- Tìm kiếm và lọc phim theo nhiều tiêu chí
+- Xem chi tiết thông tin phim
+- Giao diện thân thiện và đáp ứng trên nhiều thiết bị
+
+## Công nghệ sử dụng
+
+- **React 19**: Thư viện UI hiện đại
+- **TypeScript**: Hỗ trợ kiểu dữ liệu tĩnh
+- **Vite**: Build tool nhanh và hiệu quả
+- **Tailwind CSS**: Framework CSS utility-first
+- **React Router**: Điều hướng trong ứng dụng
 
 ## Expanding the ESLint configuration
 
@@ -24,31 +34,31 @@ export default tseslint.config({
   languageOptions: {
     // other options...
     parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
       tsconfigRootDir: import.meta.dirname,
     },
   },
-})
+});
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from "eslint-plugin-react-x";
+import reactDom from "eslint-plugin-react-dom";
 
 export default tseslint.config({
   plugins: {
     // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
+    "react-x": reactX,
+    "react-dom": reactDom,
   },
   rules: {
     // other rules...
     // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
+    ...reactX.configs["recommended-typescript"].rules,
     ...reactDom.configs.recommended.rules,
   },
-})
+});
 ```

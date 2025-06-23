@@ -1,14 +1,21 @@
 package fpt.hsf302.movtube.services;
 
+import fpt.hsf302.movtube.dtos.MoviesWithPaginationDTO;
 import fpt.hsf302.movtube.entities.Genre;
 import fpt.hsf302.movtube.entities.Movie;
+import fpt.hsf302.movtube.entities.Pagination;
 import fpt.hsf302.movtube.repositories.GenreRepository;
 import fpt.hsf302.movtube.repositories.MovieGenreRepository;
 import fpt.hsf302.movtube.repositories.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -54,6 +61,38 @@ public class MovieService {
      */
     public List<Genre> getAllGenres() {
         return genreRepository.findAll();
+    }
+
+    public MoviesWithPaginationDTO getAllMoviesWithFilter(String query,
+                                              Integer genreId,
+                                              Integer fromYear,
+                                              Integer toYear,
+                                              BigDecimal minRating,
+                                              String sortBy,
+                                              String sortDirection,
+                                              Integer page,
+                                              Integer size) {
+        Pageable pageable;
+        if (sortBy != null){
+            pageable = PageRequest.of(page, size, Sort.by(sortBy, sortDirection));
+        }else{
+            pageable = PageRequest.of(page, size);
+        }
+        Genre genre = null;
+        if(genreId != null){
+            genre = genreRepository.findById(genreId).orElse(null);
+        }
+
+        Page<Movie> movies = movieRepository.getMoviesWithFilters(query, genre, fromYear, toYear, minRating, pageable);
+        Pagination pagination = new Pagination();
+        pagination.setCurrentPage(page + 1);
+        pagination.setTotalPages(movies.getTotalPages());
+        pagination.setItemsPerPage(size);
+        pagination.setTotalItems((int)movies.getTotalElements());
+
+        MoviesWithPaginationDTO result = new MoviesWithPaginationDTO(movies.getContent(), pagination);
+
+        return result;
     }
 
 
