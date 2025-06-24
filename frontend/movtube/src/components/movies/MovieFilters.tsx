@@ -67,6 +67,7 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
   // Handle form submit
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    handleLocalFilterChange({ currentPage: 0 });
     onFilterSubmit(localFilters);
   };
   // Reset filters to default values
@@ -79,7 +80,7 @@ const MovieFilters: React.FC<MovieFiltersProps> = ({
       selectedGenre: "",
       sortBy: "",
       sortDirection: "desc",
-      itemsPerPage: 12,
+      itemsPerPage: 15,
       currentPage: 0,
     };
     setLocalFilters(defaultFilters);

@@ -53,4 +53,18 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private Set<Genre> genres = new LinkedHashSet<>();
 
+
+    @ManyToMany
+    @JoinTable(name = "movie_actors",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_id"))
+    private Set<Person> actors = new LinkedHashSet<>();
+
+
+    @ManyToMany
+    @JoinTable(name = "movie_directors",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_id"))
+    private Set<Person> directors = new LinkedHashSet<>();
+
 }

@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
                         {genres.map((genre) => (
                           <Link
                             key={genre.id}
-                            to={`/movies?genre=${genre.id}`}
+                            to={`/movies?genreId=${genre.id}`}
                             onClick={() => setGenresMenuOpen(false)}
                             className="px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors duration-150"
                             role="menuitem"
@@ -392,10 +392,11 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
                   <div className="pl-2 mt-3 mb-2">
                     {genres && genres.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2">
+                        {" "}
                         {genres.map((genre) => (
                           <Link
                             key={genre.id}
-                            to={`/movies?genre=${genre.id}`}
+                            to={`/movies?genreId=${genre.id}`}
                             onClick={() => {
                               setGenresMenuOpen(false);
                               setIsMobileMenuOpen(false);

@@ -63,6 +63,21 @@ public class MovieService {
         return genreRepository.findAll();
     }
 
+    /**
+     * Retrieves a paginated list of movies based on various filters such as query, genre, year range, minimum rating,
+     * sorting options, and pagination parameters.
+     *
+     * @param query         the search query for movie titles
+     * @param genreId      the ID of the genre to filter by
+     * @param fromYear     the starting year for filtering movies
+     * @param toYear       the ending year for filtering movies
+     * @param minRating    the minimum average rating for filtering movies
+     * @param sortBy       the field to sort by
+     * @param sortDirection the direction of sorting (asc or desc)
+     * @param page         the page number for pagination
+     * @param size         the number of items per page
+     * @return a DTO containing a list of movies and pagination information
+     */
     public MoviesWithPaginationDTO getAllMoviesWithFilter(String query,
                                               Integer genreId,
                                               Integer fromYear,
@@ -74,7 +89,7 @@ public class MovieService {
                                               Integer size) {
         Pageable pageable;
         if (sortBy != null && !sortBy.isBlank()) {
-            pageable = PageRequest.of(page, size, Sort.by(sortBy, sortDirection));
+            pageable = PageRequest.of(page, size, Sort.by(sortDirection.equalsIgnoreCase("asc")?Sort.Direction.ASC: Sort.Direction.DESC ,sortBy));
         }else{
             pageable = PageRequest.of(page, size);
         }
@@ -93,6 +108,17 @@ public class MovieService {
         MoviesWithPaginationDTO result = new MoviesWithPaginationDTO(movies.getContent(), pagination);
 
         return result;
+    }
+
+
+    /**
+     * Retrieves a movie by its ID.
+     *
+     * @param id the ID of the movie to retrieve
+     * @return the movie with the specified ID, or null if not found
+     */
+    public Movie getMovieById(Integer id) {
+        return movieRepository.findById(id).orElse(null);
     }
 
 

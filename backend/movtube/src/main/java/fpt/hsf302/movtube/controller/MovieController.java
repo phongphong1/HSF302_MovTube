@@ -46,7 +46,7 @@ public class MovieController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(required = false, defaultValue = "0") Integer page,
-            @RequestParam(required = false, defaultValue = "12") Integer size) {
+            @RequestParam(required = false, defaultValue = "15") Integer size) {
 
 
         MoviesWithPaginationDTO moviesWithPaginationDTO = movieService.getAllMoviesWithFilter(
@@ -62,5 +62,10 @@ public class MovieController {
         );
 
         return moviesWithPaginationDTO;
+    }
+
+    @GetMapping("/{id}")
+    public Movie getMovieById(@PathVariable Integer id) {
+        return movieService.getMovieById(id);
     }
 }

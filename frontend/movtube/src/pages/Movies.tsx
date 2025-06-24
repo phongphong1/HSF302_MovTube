@@ -1,36 +1,27 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { FilterOptions, Movie } from "../types";
-import { allGenres } from "../data/moviesData";
 import MovieGrid from "../components/movies/MovieGrid";
 import MovieFilters from "../components/movies/MovieFilters";
 import Pagination from "../components/ui/Pagination";
 import LoadingState from "../components/ui/LoadingState";
+import { useMovies } from "../hooks/useMovies";
 
 const Movies: React.FC = () => {
-  // Current year for range defaults
   const currentYear = new Date().getFullYear();
-  // Create genres array in the format expected by the new component
-  // Use useMemo to prevent recreation of this array on each render
-  const genresFormatted = useMemo(
-    () =>
-      allGenres
-        .filter((genre) => genre) // Filter out any undefined values
-        .map((genre, index) => ({
-          id: index + 1,
-          name: String(genre), // Convert to string safely
-        })),
-    [] // Empty dependency array means this only runs once
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Lấy tham số từ URL nếu có
+  const queryParams = new URLSearchParams(location.search);
+  const genreIdFromUrl = queryParams.get("genreId");
+  const pageFromUrl = queryParams.get("page");
+  const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 0;
 
-  // State for loading and filtered movies
+  const { genres } = useMovies();
+
   const [isLoading, setIsLoading] = useState(false);
-  // Định nghĩa kiểu dữ liệu mới để lưu thông tin phân trang từ backend
+  const [showDetailMode, setShowDetailMode] = useState(true);
+
   const [filteredMoviesData, setFilteredMoviesData] = useState<{
     movies: Movie[];
     pagination: {
@@ -44,32 +35,30 @@ const Movies: React.FC = () => {
     pagination: {
       totalItems: 0,
       totalPages: 0,
-      currentPage: 1,
-      itemsPerPage: 12,
+      currentPage: 0,
+      itemsPerPage: 15,
     },
   });
 
   const API_URL = `${import.meta.env.VITE_API_URL}/movies`;
 
-  // State for all filters
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
     minRating: 0,
     yearFrom: 1900,
     yearTo: currentYear,
-    selectedGenre: "",
+    selectedGenre: genreIdFromUrl || "",
     sortBy: "",
     sortDirection: "desc",
-    itemsPerPage: 12,
-    currentPage: 1,
+    itemsPerPage: 15,
+    currentPage: pageNumber,
   });
-  // Function to fetch movies from API with pagination handled by the backend
+
   const fetchMovies = useCallback(
     async (filterOptions: FilterOptions) => {
       setIsLoading(true);
 
       try {
-        // Simulate API call with filters and pagination
         const response = await fetch(
           `${API_URL}/search?query=${encodeURIComponent(
             filterOptions.searchTerm
@@ -103,6 +92,20 @@ const Movies: React.FC = () => {
   );
   // Initial fetch on component mount - sử dụng useRef để đảm bảo chỉ fetch một lần
   const isInitialMount = useRef(true);
+  // Theo dõi thay đổi trong URL để cập nhật bộ lọc
+  useEffect(() => {
+    // Nếu không phải lần đầu mount và URL chứa tham số
+    if (!isInitialMount.current && (genreIdFromUrl || pageFromUrl)) {
+      // Cập nhật bộ lọc dựa trên URL
+      const updatedFilters = {
+        ...filters,
+        selectedGenre: genreIdFromUrl || filters.selectedGenre,
+        currentPage: pageNumber,
+      };
+      setFilters(updatedFilters);
+      fetchMovies(updatedFilters);
+    }
+  }, [location.search]); // Chỉ chạy lại khi URL thay đổi
 
   useEffect(() => {
     // Chỉ fetch data khi component được mount lần đầu
@@ -112,25 +115,41 @@ const Movies: React.FC = () => {
     }
   }, [fetchMovies, filters]);
 
-  // Handle form submission - this is where we would call the API
+  // Hàm xử lý khi người dùng submit bộ lọc
   const handleFilterSubmit = useCallback(
     (submittedFilters: FilterOptions) => {
-      // Cập nhật state filter và gọi API
+      submittedFilters.currentPage = 0;
       setFilters(submittedFilters);
       fetchMovies(submittedFilters);
+      if (submittedFilters.selectedGenre) {
+        navigate(`/movies?genreId=${submittedFilters.selectedGenre}`, {
+          replace: true,
+        });
+      } else {
+        navigate("/movies", { replace: true });
+      }
     },
-    [fetchMovies]
-  ); // Handle page change - gọi API mới từ backend với trang đã thay đổi
+    [fetchMovies, navigate]
+  );
+
+  // Hàm xử lý khi người dùng thay đổi trang
   const handlePageChange = (page: number) => {
-    // Cập nhật state filter và gọi API với trang mới
     const updatedFilters = { ...filters, currentPage: page };
     setFilters(updatedFilters);
     fetchMovies(updatedFilters);
+    if (updatedFilters.selectedGenre) {
+      navigate(`/movies?genreId=${updatedFilters.selectedGenre}&page=${page}`, {
+        replace: true,
+      });
+    } else if (page > 0) {
+      navigate(`/movies?page=${page}`, { replace: true });
+    } else {
+      navigate("/movies", { replace: true });
+    }
   };
-  // Lấy danh sách phim đã được phân trang từ backend
-  const paginatedMovies = filteredMoviesData.movies;
 
-  // Lấy thông tin phân trang từ backend
+  // Lấy danh sách phim đã lọc và phân trang
+  const paginatedMovies = filteredMoviesData.movies;
   const totalMovies = filteredMoviesData.pagination.totalItems;
   const totalPages = filteredMoviesData.pagination.totalPages;
 
@@ -151,7 +170,7 @@ const Movies: React.FC = () => {
         <MovieFilters
           filters={filters}
           onFilterSubmit={handleFilterSubmit}
-          genres={genresFormatted}
+          genres={genres}
           totalMovies={totalMovies}
           isLoading={isLoading}
         />
@@ -166,21 +185,63 @@ const Movies: React.FC = () => {
                 </span>
               )}
             </h2>
-          </div>
 
+            <button
+              className="px-4 py-2 rounded bg-gray-800 hover:bg-gray-700 transition text-sm font-medium flex items-center gap-2"
+              onClick={() => setShowDetailMode((prev) => !prev)}
+            >
+              {showDetailMode ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect width="7" height="7" x="3" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="14" rx="1" />
+                  <rect width="7" height="7" x="3" y="14" rx="1" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect width="7" height="7" x="3" y="3" rx="1" />
+                  <rect width="7" height="7" x="3" y="14" rx="1" />
+                  <path d="M14 4h7" />
+                  <path d="M14 9h7" />
+                  <path d="M14 15h7" />
+                  <path d="M14 20h7" />
+                </svg>
+              )}
+            </button>
+          </div>
           {isLoading ? (
             <LoadingState message="Đang tìm kiếm phim..." />
           ) : (
             <MovieGrid
               movies={paginatedMovies}
+              showDetailMode={showDetailMode}
               emptyTitle="Không tìm thấy phim nào"
               emptyMessage="Hãy thử điều chỉnh các bộ lọc của bạn"
             />
-          )}
-
+          )}{" "}
           {totalPages > 1 && !isLoading && (
             <Pagination
-              currentPage={filters.currentPage}
+              currentPage={filters.currentPage} // This is 0-based, Pagination component will handle the display conversion
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />

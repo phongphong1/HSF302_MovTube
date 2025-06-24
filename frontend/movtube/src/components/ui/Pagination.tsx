@@ -1,9 +1,9 @@
 import React from "react";
 
 interface PaginationProps {
-  currentPage: number;
+  currentPage: number; // This is expected to be 0-based (from the backend)
   totalPages: number;
-  onPageChange: (page: number) => void;
+  onPageChange: (page: number) => void; // This should receive 0-based page for the backend
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -11,7 +11,10 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  // Generate an array of page numbers to display
+  // Convert 0-based currentPage to 1-based for UI display
+  const displayPage = currentPage + 1;
+
+  // Generate an array of page numbers to display (1-based for UI)
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -25,17 +28,17 @@ const Pagination: React.FC<PaginationProps> = ({
       // Always include first page
       pages.push(1);
 
-      // Calculate the range of pages to show around current page
-      let startPage = Math.max(2, currentPage - 1);
-      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      // Calculate the range of pages to show around current display page
+      let startPage = Math.max(2, displayPage - 1);
+      let endPage = Math.min(totalPages - 1, displayPage + 1);
 
       // Adjust if we're near the beginning
-      if (currentPage <= 3) {
+      if (displayPage <= 3) {
         endPage = 4;
       }
 
       // Adjust if we're near the end
-      if (currentPage >= totalPages - 2) {
+      if (displayPage >= totalPages - 2) {
         startPage = totalPages - 3;
       }
 
@@ -62,13 +65,12 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   const pages = getPageNumbers();
-
   return (
     <div className="flex justify-center mt-8">
       <nav className="inline-flex rounded-md shadow">
         <button
-          onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => currentPage > 0 && onPageChange(currentPage - 1)}
+          disabled={currentPage === 0}
           className="px-3 py-1 rounded-l-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           &laquo; Trước
@@ -85,9 +87,9 @@ const Pagination: React.FC<PaginationProps> = ({
           ) : (
             <button
               key={page}
-              onClick={() => onPageChange(page as number)}
+              onClick={() => onPageChange((page as number) - 1)} // Convert 1-based UI page to 0-based index for backend
               className={`px-3 py-1 border border-gray-700 ${
-                currentPage === page
+                displayPage === page
                   ? "bg-red-600 text-white"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}
@@ -99,9 +101,9 @@ const Pagination: React.FC<PaginationProps> = ({
 
         <button
           onClick={() =>
-            currentPage < totalPages && onPageChange(currentPage + 1)
+            currentPage < totalPages - 1 && onPageChange(currentPage + 1)
           }
-          disabled={currentPage === totalPages}
+          disabled={currentPage >= totalPages - 1}
           className="px-3 py-1 rounded-r-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Tiếp &raquo;
