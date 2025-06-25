@@ -1,5 +1,20 @@
 import { useEffect, useState } from 'react';
 
+interface Genre{
+    id: number;
+    name: string;
+}
+
+interface People{
+    id: string;
+    name: string;
+}
+
+interface Episodes{
+    id: string;
+    orderNumber: number;
+    url: string;
+}
 interface MovieDetail {
     id: string;
     title: string;
@@ -7,12 +22,15 @@ interface MovieDetail {
     synopsis: string;
     year: number;
     durationMinutes: number;
-    genres: string[];
+    genres: Genre[];
     averageRating: number;
     totalEpisodes: number;
-    actors: string[];
-    directors: string[];
+    actors: People[];
+    directors: People[];
     posterUrl: string;
+    thumbnailUrl: string;
+    trailerUrl?: string;
+    episodes?: Episodes[];
 }
 
 interface UseMovieDetailResult {
