@@ -3,6 +3,8 @@ package fpt.hsf302.movtube.controller;
 
 import fpt.hsf302.movtube.dtos.HomeMovieDTO;
 import fpt.hsf302.movtube.dtos.MoviesWithPaginationDTO;
+import fpt.hsf302.movtube.dtos.PlayerDTO;
+import fpt.hsf302.movtube.entities.Episode;
 import fpt.hsf302.movtube.entities.Genre;
 import fpt.hsf302.movtube.entities.Movie;
 import fpt.hsf302.movtube.entities.MovieGenre;
@@ -67,5 +69,10 @@ public class MovieController {
     @GetMapping("/{id}")
     public Movie getMovieById(@PathVariable Integer id) {
         return movieService.getMovieById(id);
+    }
+
+    @GetMapping("/watch/{id}")
+    public PlayerDTO getEpisodeForWatch(@PathVariable Integer id) {
+        return movieService.getEpisodeById(id);
     }
 }

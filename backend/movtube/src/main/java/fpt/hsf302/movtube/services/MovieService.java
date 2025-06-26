@@ -1,9 +1,12 @@
 package fpt.hsf302.movtube.services;
 
 import fpt.hsf302.movtube.dtos.MoviesWithPaginationDTO;
+import fpt.hsf302.movtube.dtos.PlayerDTO;
+import fpt.hsf302.movtube.entities.Episode;
 import fpt.hsf302.movtube.entities.Genre;
 import fpt.hsf302.movtube.entities.Movie;
 import fpt.hsf302.movtube.entities.Pagination;
+import fpt.hsf302.movtube.repositories.EpisodeRepository;
 import fpt.hsf302.movtube.repositories.GenreRepository;
 import fpt.hsf302.movtube.repositories.MovieGenreRepository;
 import fpt.hsf302.movtube.repositories.MovieRepository;
@@ -24,15 +27,18 @@ public class MovieService {
     private MovieGenreRepository movieGenreRepository;
     private MovieRepository movieRepository;
     private GenreRepository genreRepository;
+    private EpisodeRepository episodeRepository;
 
     @Autowired
     public MovieService(MovieGenreRepository movieGenreRepository,
                         MovieRepository movieRepository,
-                        GenreRepository genreRepository) {
+                        GenreRepository genreRepository,
+                        EpisodeRepository episodeRepository) {
 
         this.movieGenreRepository = movieGenreRepository;
         this.movieRepository = movieRepository;
         this.genreRepository = genreRepository;
+        this.episodeRepository = episodeRepository;
 
     }
 
@@ -121,5 +127,21 @@ public class MovieService {
         return movieRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Retrieves an episode by its ID.
+     *
+     * @param id the ID of the episode to retrieve
+     * @return the episode with the specified ID, or null if not found
+     */
+    public PlayerDTO getEpisodeById(Integer id) {
+        Episode episode = episodeRepository.findById(id).orElse(null);
+        Episode nextEpisode = episodeRepository.findByMovieAndOrderNumber(episode.getMovie(), episode.getOrderNumber() + 1);
+        Episode prevEpisode = episodeRepository.findByMovieAndOrderNumber(episode.getMovie(), episode.getOrderNumber() - 1);
 
+        PlayerDTO playerDTO = new PlayerDTO(episode,
+                episode.getOrderNumber(),
+                nextEpisode != null ? nextEpisode.getId(): null,
+                prevEpisode != null ? prevEpisode.getId(): null);
+        return playerDTO;
+    }
 }

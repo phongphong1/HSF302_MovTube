@@ -45,3 +45,19 @@ export interface FilterOptions {
   itemsPerPage: number;
   currentPage: number;
 }
+
+export interface Episodes{
+    id: string;
+    orderNumber: number;
+    url: string;
+}
+
+export interface People{
+    id: string;
+    name: string;
+}
+
+export interface Genre{
+    id: number;
+    name: string;
+}

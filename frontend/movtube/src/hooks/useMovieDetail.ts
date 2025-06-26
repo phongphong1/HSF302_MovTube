@@ -1,20 +1,7 @@
 import { useEffect, useState } from 'react';
+import type { Episodes, Genre, People } from '../types';
 
-interface Genre{
-    id: number;
-    name: string;
-}
 
-interface People{
-    id: string;
-    name: string;
-}
-
-interface Episodes{
-    id: string;
-    orderNumber: number;
-    url: string;
-}
 interface MovieDetail {
     id: string;
     title: string;
