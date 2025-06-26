@@ -40,10 +40,13 @@ const MoviePlayer: React.FC = () => {
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-white text-xl font-bold truncate">
             {data?.title}
-            {data?.episode && (
-              <span className="ml-2 text-red-500">Tập {data.episode}</span>
+            {data?.originalName && (
+              <span className="text-gray-400 ml-2">({data.originalName})</span>
             )}
           </h1>
+          {data?.episode && data?.episodes.length > 1 && (
+            <span className="ml-2 text-red-500">Tập {data.episode}</span>
+          )}
         </div>
       </div>
 
@@ -57,29 +60,6 @@ const MoviePlayer: React.FC = () => {
               console.error("Video Player Error:", error);
             }}
           />
-        </div>
-      </div>
-
-      {/* Movie information */}
-      <div className="container mx-auto px-4 py-6 mt-4">
-        <div className="bg-gray-900 rounded-lg shadow-lg p-6">
-          {data && (
-            <>
-              <h1 className="text-white text-2xl font-bold mb-2">
-                {data.title}
-              </h1>
-              {data.originalName && (
-                <h2 className="text-gray-400 text-lg mb-4">
-                  {data.originalName}
-                </h2>
-              )}
-              {data.episode && (
-                <div className="inline-block bg-red-600 text-white text-sm px-3 py-1 rounded-full mb-4">
-                  Tập {data.episode}
-                </div>
-              )}
-            </>
-          )}
         </div>
       </div>
     </div>

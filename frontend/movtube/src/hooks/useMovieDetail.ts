@@ -17,7 +17,7 @@ interface MovieDetail {
     posterUrl: string;
     thumbnailUrl: string;
     trailerUrl?: string;
-    episodes?: Episodes[];
+    episodes: Episodes[];
 }
 
 interface UseMovieDetailResult {

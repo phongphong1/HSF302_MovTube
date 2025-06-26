@@ -7,11 +7,16 @@ import Movies from "./pages/Movies";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import MoviePlayer from "./pages/MoviePlayer";
+import Login from "./pages/Login";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Login route - standalone without Layout */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Main app routes with Layout */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="movies" element={<Movies />} />

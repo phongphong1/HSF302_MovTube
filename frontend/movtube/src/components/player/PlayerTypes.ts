@@ -10,7 +10,7 @@ export interface MoviePlayerData {
   posterUrl?: string;
   nextEpisodeId?: string;
   prevEpisodeId?: string;
-  episodes?: Episodes[];
+  episodes: Episodes[];
 }
 
 export interface VideoElementProps {

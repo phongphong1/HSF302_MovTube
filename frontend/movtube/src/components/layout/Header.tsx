@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMovies } from "../../hooks/useMovies";
 
 interface HeaderProps {
@@ -11,7 +11,12 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [genresMenuOpen, setGenresMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { genres } = useMovies();
 
   // Check if we're on the movie detail page for transparency
@@ -50,13 +55,38 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
           setGenresMenuOpen(false);
         }
       }
+
+      if (searchOpen && event.target instanceof Element) {
+        const searchPopupElement = document.getElementById("search-popup");
+        if (
+          searchPopupElement &&
+          !searchPopupElement.contains(event.target) &&
+          !(event.target as Element).closest(".search-button")
+        ) {
+          setSearchOpen(false);
+        }
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [userMenuOpen, genresMenuOpen]);
+  }, [userMenuOpen, genresMenuOpen, searchOpen]);
+
+  // Handle ESC key press to close search popup
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && searchOpen) {
+        setSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [searchOpen]);
 
   const toggleMobileMenu = () => {
     const newState = !isMobileMenuOpen;
@@ -64,6 +94,34 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
     if (onMobileMenuToggle) {
       onMobileMenuToggle(newState);
     }
+  };
+
+  const handleSearchToggle = () => {
+    setSearchOpen(!searchOpen);
+    if (!searchOpen && searchInputRef.current) {
+      // Delay để cho hiệu ứng transition hiển thị trước khi focus
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, 100);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    // Thực hiện tìm kiếm và chuyển hướng đến trang kết quả
+    console.log("Searching for:", searchQuery);
+
+    // Sử dụng navigate để chuyển hướng sang trang Movies với query tìm kiếm
+    setTimeout(() => {
+      setIsSearching(false);
+      setSearchOpen(false);
+      navigate(`/movies?query=${encodeURIComponent(searchQuery)}`);
+    }, 500); // Thêm timeout nhỏ để hiển thị hiệu ứng loading
   };
 
   return (
@@ -169,7 +227,11 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
 
           {/* User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="text-white hover:text-red-500">
+            <button
+              onClick={handleSearchToggle}
+              className="text-white hover:text-red-500 transition-transform duration-200 search-button"
+              aria-label="Tìm kiếm"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -344,6 +406,31 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
           <nav className="mt-4 md:hidden">
             <ul className="flex flex-col space-y-3 pb-3">
               <li>
+                <button
+                  onClick={() => {
+                    handleSearchToggle();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center w-full text-white font-medium transition-colors hover:text-red-500 search-button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  Tìm kiếm phim
+                </button>
+              </li>
+              <li>
                 <Link
                   to="/"
                   className={`block text-white font-medium transition-colors hover:text-red-500 ${
@@ -426,6 +513,124 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuToggle }) => {
             </ul>
           </nav>
         )}
+
+        {/* Search Popup */}
+        <div
+          id="search-popup"
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-black transition-all duration-300 ${
+            searchOpen
+              ? "bg-opacity-80 backdrop-blur-sm opacity-100 visible"
+              : "bg-opacity-0 backdrop-blur-none opacity-0 invisible"
+          }`}
+        >
+          <div
+            className={`bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-6 max-w-2xl w-full mx-4 transform transition-all duration-300 ${
+              searchOpen
+                ? "scale-100 translate-y-0"
+                : "scale-95 -translate-y-10"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-white text-xl font-semibold flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2 text-red-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                Tìm kiếm phim
+              </h2>
+              <button
+                onClick={handleSearchToggle}
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Đóng tìm kiếm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Nhập tên phim"
+                className="w-full px-5 py-3 pl-12 text-white bg-gray-800 rounded-lg border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors"
+                autoFocus
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <button
+                type="submit"
+                disabled={isSearching}
+                className="absolute inset-y-0 right-0 flex items-center px-4 font-medium rounded-r-lg bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-200 disabled:opacity-70"
+              >
+                {isSearching ? (
+                  <div className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Đang tìm
+                  </div>
+                ) : (
+                  "Tìm kiếm"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </header>
   );

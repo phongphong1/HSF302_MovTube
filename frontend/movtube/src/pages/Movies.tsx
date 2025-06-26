@@ -15,6 +15,7 @@ const Movies: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const genreIdFromUrl = queryParams.get("genreId");
   const pageFromUrl = queryParams.get("page");
+  const searchQueryFromUrl = queryParams.get("query");
   const pageNumber = pageFromUrl ? parseInt(pageFromUrl, 10) : 0;
 
   const { genres } = useMovies();
@@ -43,7 +44,7 @@ const Movies: React.FC = () => {
   const API_URL = `${import.meta.env.VITE_API_URL}/movies`;
 
   const [filters, setFilters] = useState<FilterOptions>({
-    searchTerm: "",
+    searchTerm: searchQueryFromUrl || "",
     minRating: 0,
     yearFrom: 1900,
     yearTo: currentYear,
@@ -95,11 +96,15 @@ const Movies: React.FC = () => {
   // Theo dõi thay đổi trong URL để cập nhật bộ lọc
   useEffect(() => {
     // Nếu không phải lần đầu mount và URL chứa tham số
-    if (!isInitialMount.current && (genreIdFromUrl || pageFromUrl)) {
+    if (
+      !isInitialMount.current &&
+      (genreIdFromUrl || pageFromUrl || searchQueryFromUrl)
+    ) {
       // Cập nhật bộ lọc dựa trên URL
       const updatedFilters = {
         ...filters,
         selectedGenre: genreIdFromUrl || filters.selectedGenre,
+        searchTerm: searchQueryFromUrl || filters.searchTerm,
         currentPage: pageNumber,
       };
       setFilters(updatedFilters);
@@ -121,10 +126,21 @@ const Movies: React.FC = () => {
       submittedFilters.currentPage = 0;
       setFilters(submittedFilters);
       fetchMovies(submittedFilters);
+
+      // Xây dựng URL dựa trên bộ lọc
+      const urlParams = new URLSearchParams();
+
       if (submittedFilters.selectedGenre) {
-        navigate(`/movies?genreId=${submittedFilters.selectedGenre}`, {
-          replace: true,
-        });
+        urlParams.append("genreId", submittedFilters.selectedGenre);
+      }
+
+      if (submittedFilters.searchTerm) {
+        urlParams.append("query", submittedFilters.searchTerm);
+      }
+
+      const queryString = urlParams.toString();
+      if (queryString) {
+        navigate(`/movies?${queryString}`, { replace: true });
       } else {
         navigate("/movies", { replace: true });
       }
@@ -137,12 +153,25 @@ const Movies: React.FC = () => {
     const updatedFilters = { ...filters, currentPage: page };
     setFilters(updatedFilters);
     fetchMovies(updatedFilters);
+
+    // Xây dựng URL với tất cả các tham số hiện tại
+    const urlParams = new URLSearchParams();
+
     if (updatedFilters.selectedGenre) {
-      navigate(`/movies?genreId=${updatedFilters.selectedGenre}&page=${page}`, {
-        replace: true,
-      });
-    } else if (page > 0) {
-      navigate(`/movies?page=${page}`, { replace: true });
+      urlParams.append("genreId", updatedFilters.selectedGenre);
+    }
+
+    if (updatedFilters.searchTerm) {
+      urlParams.append("query", updatedFilters.searchTerm);
+    }
+
+    if (page > 0) {
+      urlParams.append("page", page.toString());
+    }
+
+    const queryString = urlParams.toString();
+    if (queryString) {
+      navigate(`/movies?${queryString}`, { replace: true });
     } else {
       navigate("/movies", { replace: true });
     }

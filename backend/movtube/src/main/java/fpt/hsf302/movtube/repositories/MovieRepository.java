@@ -16,7 +16,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     List<Movie> findTop3ByOrderByYearDesc();
 
     @Query("SELECT m FROM Movie m " +
-            "WHERE (LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL) " +
+            "WHERE (LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(m.originalName) LIKE LOWER(CONCAT('%', :query, '%')) OR :query IS NULL) " +
             "AND (:genre IS NULL OR :genre MEMBER OF m.genres) " +
             "AND (m.year >= :fromYear OR :fromYear IS NULL) " +
             "AND (m.year <= :toYear OR :toYear IS NULL) " +

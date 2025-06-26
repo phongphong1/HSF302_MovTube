@@ -12,10 +12,9 @@ const MovieDetail: React.FC = () => {
     ? useMovieDetail(id)
     : { data: null, loading: false, error: null };
   const [isEpisodeSelectorOpen, setIsEpisodeSelectorOpen] = useState(false);
-  const watchFilm = (url: string) => {
+  const watchFilm = (id: string) => {
     setIsEpisodeSelectorOpen(false);
-    //Tạm thời chỉ log URL để test
-    console.log(`Watching film at URL: ${url}`);
+    window.location.href = `/movies/watch/${id}`;
   };
 
   if (loading) {
@@ -106,7 +105,12 @@ const MovieDetail: React.FC = () => {
 
                 <div className="mt-6 flex gap-4">
                   {data.totalEpisodes === 1 ? (
-                    <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg flex items-center transition-all duration-200 shadow-lg hover:shadow-red-600/30">
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg flex items-center transition-all duration-200 shadow-lg hover:shadow-red-600/30"
+                      onClick={() => {
+                        window.location.href = `/movies/watch/${data.episodes[0].id}`;
+                      }}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -259,7 +263,6 @@ const MovieDetail: React.FC = () => {
               onClose={() => setIsEpisodeSelectorOpen(false)}
               episodes={data.episodes || []}
               onSelectEpisode={watchFilm}
-              movieTitle="Chọn tập phim"
             />
           </div>
         </div>

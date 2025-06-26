@@ -11,7 +11,6 @@ interface EpisodeSelectorProps {
   episodes: Episode[];
   currentEpisode?: string | null;
   onSelectEpisode: (episodeId: string) => void;
-  movieTitle: string;
 }
 
 const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
@@ -20,7 +19,6 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
   episodes,
   currentEpisode,
   onSelectEpisode,
-  movieTitle,
 }) => {
   if (!isOpen) return null;
 
@@ -29,7 +27,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
       <div className="bg-gray-800 rounded-lg w-full max-w-4xl max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h3 className="text-xl font-semibold text-white">{movieTitle}</h3>
+          <h3 className="text-xl font-semibold text-white">Chọn tập</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white focus:outline-none"
@@ -56,7 +54,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
             {episodes.map((ep) => (
               <div
                 key={ep.id}
-                onClick={() => onSelectEpisode(ep.url)}
+                onClick={() => onSelectEpisode(ep.id)}
                 className={`cursor-pointer rounded-md overflow-hidden transition-all duration-200 ${
                   currentEpisode === ep.id
                     ? "ring-2 ring-red-500 scale-105"
