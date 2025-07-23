@@ -18,6 +18,7 @@ public class PlayerDTO {
     private Integer nextEpisodeId;
     private Integer prevEpisodeId;
     private Set<Episode> episodes;
+    private Movie movie;
 
     public PlayerDTO(Episode episode, Integer episodeNumber, Integer nextEpisodeId, Integer prevEpisodeId) {
         this.episodeId = episode.getId();
@@ -29,5 +30,6 @@ public class PlayerDTO {
         this.nextEpisodeId = nextEpisodeId;
         this.prevEpisodeId = prevEpisodeId;
         this.episodes = episode.getMovie().getEpisodes();
+        this.movie = episode.getMovie();
     }
 }

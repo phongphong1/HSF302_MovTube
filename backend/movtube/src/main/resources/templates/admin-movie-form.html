@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title th:text="${movie.id != null} ? 'Sửa phim' : 'Thêm phim'">Thêm/Sửa phim</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <th:block layout:fragment="head-content"></th:block>
+</head>
+<body class="bg-gray-900 text-white">
+<div layout:fragment="content">
+    <div class="container mx-auto py-10 max-w-xl">
+        <h2 class="text-3xl font-bold mb-8 text-center" th:text="${movie.id != null} ? 'Sửa phim' : 'Thêm phim'"></h2>
+        <form th:action="${movie.id != null} ? @{'/admin/movies/edit/' + ${movie.id}} : @{/admin/movies/add}" method="post" th:object="${movie}" class="bg-gray-800 rounded-lg shadow-lg p-6 space-y-4">
+            <div>
+                <label class="block mb-1">Tên phim</label>
+                <input type="text" th:field="*{title}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" required />
+            </div>
+            <div>
+                <label class="block mb-1">Tên gốc</label>
+                <input type="text" th:field="*{originalName}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Năm</label>
+                <input type="number" th:field="*{year}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Thể loại</label>
+                <select th:field="*{genres}" multiple class="w-full px-3 py-2 rounded bg-gray-700 text-white">
+                    <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}" th:selected="${movie.genres != null and movie.genres.contains(genre)}"></option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-1">Tóm tắt</label>
+                <textarea th:field="*{synopsis}" class="w-full px-3 py-2 rounded bg-gray-700 text-white"></textarea>
+            </div>
+            <div>
+                <label class="block mb-1">Thời lượng (phút)</label>
+                <input type="number" th:field="*{durationMinutes}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Poster URL</label>
+                <input type="text" th:field="*{posterUrl}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Điểm trung bình</label>
+                <input type="number" step="0.01" th:field="*{averageRating}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Tổng số tập</label>
+                <input type="number" th:field="*{totalEpisodes}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+
+            <div>
+                <label class="block mb-1">Thumbnail URL</label>
+                <input type="text" th:field="*{thumbnailUrl}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+                <label class="block mb-1">Trailer URL</label>
+                <input type="text" th:field="*{trailerUrl}" class="w-full px-3 py-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div class="flex justify-between mt-6">
+                <a th:href="@{/admin/movies}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Quay lại</a>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

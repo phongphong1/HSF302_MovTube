@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html
+  lang="vi"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <title>Trang chủ - MovTube</title>
+  </head>
+
+  <div layout:fragment="content">
+    <!-- Hero Section -->
+    <div
+      class="relative h-[60vh] bg-cover bg-center"
+      th:style="'background-image: url(' + ${heroMovie?.backdrop ?: '/images/hero-bg.jpg'} + ')'"
+    >
+      <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+      <div
+        class="relative container mx-auto px-4 h-full flex flex-col justify-center"
+      >
+        <h1 class="text-5xl font-bold mb-4 text-white">
+          Chào mừng đến với MovTube
+        </h1>
+        <p class="text-xl max-w-2xl mb-8 text-gray-200">
+          Khám phá bộ sưu tập phim đa dạng của chúng tôi. Hãy tìm kiếm những bộ
+          phim yêu thích, khám phá các thể loại mới và thưởng thức những bộ phim
+          hot nhất hiện nay.
+        </p>
+        <div>
+          <a
+            th:href="@{/movies}"
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300"
+          >
+            Xem Ngay
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Movies Section -->
+    <div class="container mx-auto px-4 py-12">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-white">Phim nổi bật</h2>
+        <a th:href="@{/movies}" class="text-red-500 hover:text-red-400">
+          Xem tất cả →
+        </a>
+      </div>
+
+      <!-- Movies Grid -->
+      <div
+        th:if="${featuredMovies != null and !featuredMovies.isEmpty()}"
+        class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
+      >
+        <div
+          th:each="movie : ${featuredMovies}"
+          class="group relative overflow-hidden rounded-lg shadow-lg transition-transform hover:scale-105"
+        >
+          <a th:href="@{/movies/{id}(id=${movie.id})}">
+            <img
+              th:src="${movie.posterUrl}"
+              th:alt="${movie.title}"
+              class="w-full h-auto object-cover aspect-[2/3]"
+              loading="lazy"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <div class="absolute bottom-0 left-0 right-0 p-4">
+                <h3
+                  th:text="${movie.title}"
+                  class="font-semibold text-white text-sm mb-1"
+                ></h3>
+                <p
+                  th:text="${movie.year}"
+                  class="text-gray-300 text-xs"
+                ></p>
+                <div class="flex items-center mt-2">
+                  <svg
+                    class="w-4 h-4 text-yellow-500 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                    />
+                  </svg>
+                  <span
+                    th:text="${movie.averageRating}"
+                    class="text-yellow-500 text-xs"
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div th:if="${featuredMovies == null}" class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"
+        ></div>
+        <p class="text-gray-400 mt-4">Đang tải phim...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        th:if="${featuredMovies != null and featuredMovies.isEmpty()}"
+        class="text-center py-12"
+      >
+        <svg
+          class="w-16 h-16 text-gray-400 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h4z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 8v12a2 2 0 002 2h10a2 2 0 002-2V8"
+          />
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-300 mb-2">
+          Không có phim nào
+        </h3>
+        <p class="text-gray-400">Chưa có phim nổi bật nào được tìm thấy.</p>
+      </div>
+    </div>
+
+    <!-- New Movies Section -->
+    <div class="container mx-auto px-4 py-12">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-white">Phim mới</h2>
+        <a th:href="@{/movies}" class="text-red-500 hover:text-red-400">
+          Xem tất cả →
+        </a>
+      </div>
+
+      <!-- Movies Grid -->
+      <div
+        th:if="${newMovies != null and !newMovies.isEmpty()}"
+        class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
+      >
+        <div
+          th:each="movie : ${newMovies}"
+          class="group relative overflow-hidden rounded-lg shadow-lg transition-transform hover:scale-105"
+        >
+          <a th:href="@{/movies/{id}(id=${movie.id})}">
+            <img
+              th:src="${movie.posterUrl}"
+              th:alt="${movie.title}"
+              class="w-full h-auto object-cover aspect-[2/3]"
+              loading="lazy"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <div class="absolute bottom-0 left-0 right-0 p-4">
+                <h3
+                  th:text="${movie.title}"
+                  class="font-semibold text-white text-sm mb-1"
+                ></h3>
+                <p
+                  th:text="${movie.year}"
+                  class="text-gray-300 text-xs"
+                ></p>
+                <div class="flex items-center mt-2">
+                  <svg
+                    class="w-4 h-4 text-yellow-500 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                    />
+                  </svg>
+                  <span
+                    th:text="${movie.averageRating}"
+                    class="text-yellow-500 text-xs"
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div th:if="${newMovies == null}" class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"
+        ></div>
+        <p class="text-gray-400 mt-4">Đang tải phim...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        th:if="${newMovies != null and newMovies.isEmpty()}"
+        class="text-center py-12"
+      >
+        <svg
+          class="w-16 h-16 text-gray-400 mx-auto mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h4z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 8v12a2 2 0 002 2h10a2 2 0 002-2V8"
+          />
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-300 mb-2">
+          Không có phim nào
+        </h3>
+        <p class="text-gray-400">Chưa có phim mới nào được tìm thấy.</p>
+      </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="container mx-auto px-4 py-12">
+      <h2 class="text-3xl font-bold text-white mb-6">Thể loại phim</h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <a
+          th:each="genre : ${genres}"
+          th:href="@{/movies(genreId=${genre.id})}"
+          class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 transition-all duration-300 p-6 text-center"
+        >
+          <h3 th:text="${genre.name}" class="text-white font-semibold"></h3>
+        </a>
+      </div>
+    </div>
+  </div>
+</html>

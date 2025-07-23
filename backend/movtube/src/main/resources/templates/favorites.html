@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Phim yêu thích</title>
+    <meta charset="UTF-8" />
+    <th:block layout:fragment="head-content"></th:block>
+</head>
+<div layout:fragment="content">
+    <div class="container mx-auto py-10">
+        <h2 class="text-3xl font-bold mb-8 text-center">Phim yêu thích của bạn</h2>
+        <div th:if="${favorites.size() == 0}" class="text-center text-gray-400">Bạn chưa có phim yêu thích nào.</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div th:each="fav : ${favorites}" class="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col items-center">
+                <a th:href="@{/movies/{id}(id=${fav.movie.id})}" class="w-full flex flex-col items-center">
+                    <img th:src="${fav.movie.posterUrl}" alt="Poster" class="w-full h-72 object-cover"/>
+                    <div class="font-semibold text-lg text-center mt-4 mb-2 px-2" th:text="${fav.movie.title}"></div>
+                </a>
+                <form th:action="@{/favorites/toggle/{id}(id=${fav.movie.id})}" method="post" class="mb-4">
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Bỏ yêu thích</button>
+                </form>
+            </div>
+        </div>
+        <div class="mt-10 text-center">
+            <a th:href="@{/}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition">&larr; Quay về trang chủ</a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts"></th:block>
+</html>

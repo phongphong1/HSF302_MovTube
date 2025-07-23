@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <title th:text="${movie?.title + ' - MovTube'}">
+      Chi tiết phim - MovTube
+    </title>
+  </head>
+
+  <div layout:fragment="content">
+    <div th:if="${movie != null}" class="bg-gray-900 text-white min-h-screen">
+      <!-- Hero Section with Backdrop -->
+      <div
+        class="relative h-[70vh] bg-cover bg-center"
+        th:style="'background-image: url(' + ${movie.thumbnailUrl ?: movie.posterUrl} + ')'"
+      >
+        <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+        <div
+          class="relative container mx-auto px-4 h-full flex items-end pb-16"
+        >
+          <div class="flex items-end space-x-8">
+            <!-- Movie Poster -->
+            <div class="flex-shrink-0">
+              <img
+                th:src="${movie.posterUrl}"
+                th:alt="${movie.title}"
+                class="w-64 h-96 object-cover rounded-lg shadow-2xl"
+              />
+            </div>
+
+            <!-- Movie Info -->
+            <div class="flex-1">
+              <h1 th:text="${movie.title}" class="text-5xl font-bold mb-4"></h1>
+              <p
+                th:if="${movie.originalName}"
+                th:text="${movie.originalName}"
+                class="text-xl text-gray-300 mb-4"
+              ></p>
+
+              <div class="flex items-center space-x-6 mb-6">
+                <span th:text="${movie.year}" class="text-lg"></span>
+                <span
+                  th:text="${movie.durationMinutes + ' phút'}"
+                  class="text-lg"
+                ></span>
+                <div class="flex items-center">
+                  <svg
+                    class="w-5 h-5 text-yellow-500 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                    />
+                  </svg>
+                  <span
+                    th:text="${movie.averageRating + '/10'}"
+                    class="text-yellow-500 text-lg font-semibold"
+                  ></span>
+                </div>
+              </div>
+
+              <!-- Genres -->
+              <div class="flex flex-wrap gap-2 mb-6">
+                <span
+                  th:each="genre : ${movie.genres}"
+                  th:text="${genre.name}"
+                  class="px-3 py-1 bg-red-600 text-white rounded-full text-sm"
+                >
+                </span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex space-x-4">
+                <button
+                  th:if="${movie.episodes != null and !movie.episodes.isEmpty()}"
+                  onclick="openEpisodeSelector()"
+                  class="flex items-center px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-lg font-semibold"
+                >
+                  <svg
+                    class="w-6 h-6 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Xem Phim
+                </button>
+
+                <form th:action="@{/favorites/toggle/{id}(id=${movie.id})}" method="post">
+                  <button
+                    sec:authorize="isAuthenticated()"
+                    th:text="${isFavorite} ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'"
+                    class="flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                  </button>
+                </form>
+
+                <button
+                  class="flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  <svg
+                    class="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                    />
+                  </svg>
+                  Chia sẻ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Movie Details Section -->
+      <div class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <!-- Main Content -->
+          <div class="lg:col-span-2">
+            <div
+                    th:if="${movie.synopsis != null}"
+                    class="mb-12"
+            >
+              <h2 class="text-2xl font-bold mb-6">Mô tả</h2>
+              <div>
+                <p
+                        th:text="${movie.synopsis}"
+                        class="text-lg text-gray-200 leading-relaxed mb-8 max-w-4xl"
+                ></p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Sidebar -->
+          <div class="lg:col-span-1">
+            <!-- Movie Info -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold mb-4">Thông tin phim</h3>
+              <div class="space-y-3">
+                <div>
+                  <span class="text-gray-400">Đạo diễn:</span>
+                  <br>
+                  <span th:each="director, iterStat : ${movie.directors}" th:text="${director.name + (iterStat.last ? '' : ', ')}" class="ml-2"></span>
+                </div>
+                <div>
+                  <span class="text-gray-400">Diễn viên:</span>
+                  <br>
+                  <span th:each="actor, iterStat : ${movie.actors}" th:text="${actor.name + (iterStat.last ? '' : ', ')}" class="ml-2"></span>
+                </div>
+                <div>
+                  <span class="text-gray-400">Năm phát hành:</span>
+                  <br>
+                  <span th:text="${movie.year}" class="ml-2"></span>
+                </div>
+                <div>
+                  <span class="text-gray-400">Thời lượng: </span>
+                  <br>
+                  <span th:text="${movie.durationMinutes}" class="ml-2"></span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Episode Selector Modal -->
+    <div
+      id="episodeSelector"
+      class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[80vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Chọn tập phim</h2>
+            <button
+              onclick="closeEpisodeSelector()"
+              class="text-gray-400 hover:text-white"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
+            <a
+              th:each="episode : ${movie.episodes}"
+              th:href="@{/movies/watch/{episodeId}(episodeId=${episode.id})}"
+              class="bg-gray-700 hover:bg-red-600 transition-colors rounded-lg p-4 text-center"
+            >
+              <span
+                th:text="'Tập ' + ${episode.orderNumber}"
+                class="font-semibold"
+              >
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div
+      th:if="${movie == null}"
+      class="min-h-screen bg-gray-900 text-white p-4"
+    >
+      <div class="container mx-auto text-center py-20">
+        <h1 class="text-3xl font-bold mb-4">Không tìm được phim</h1>
+        <p class="mb-6">Bộ phim bạn tìm có vẻ đang không tồn tại!</p>
+        <a
+          th:href="@{/movies}"
+          class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg"
+        >
+          Quay lại danh sách phim
+        </a>
+      </div>
+    </div>
+
+
+  <th:block layout:fragment="scripts">
+    <script>
+      var isEpisodeSelectorOpen = false;
+      function openEpisodeSelector() {
+        document.getElementById("episodeSelector").classList.remove("hidden");
+      }
+
+      function closeEpisodeSelector() {
+        document.getElementById("episodeSelector").classList.add("hidden");
+      }
+
+      // document
+      //         .getElementById("episodeSelector")
+      //         .addEventListener("click", function (e) {
+      //           if (e.target === this) {
+      //             isEpisodeSelectorOpen = !isEpisodeSelectorOpen;
+      //             if(isEpisodeSelectorOpen) {
+      //               openEpisodeSelector();
+      //             }else {
+      //               closeEpisodeSelector();
+      //             }
+      //           }
+      //         });
+
+      // Close modal with Escape key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeEpisodeSelector();
+        }
+      });
+    </script>
+  </th:block>
+  </div>
+</html>

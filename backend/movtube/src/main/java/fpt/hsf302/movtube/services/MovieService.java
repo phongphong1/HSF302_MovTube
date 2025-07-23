@@ -18,9 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class MovieService {
@@ -143,5 +141,25 @@ public class MovieService {
                 nextEpisode != null ? nextEpisode.getId(): null,
                 prevEpisode != null ? prevEpisode.getId(): null);
         return playerDTO;
+    }
+
+    /**
+     * Retrieves a list of all movies in the database.
+     *
+     * @return a list of all movies
+     */
+    public List<Movie> findAll() {
+        return movieRepository.findAll();
+    }
+
+    public Page<Movie> findAllPaged(int page, int size) {
+        return movieRepository.findAll(PageRequest.of(page, size));
+    }
+
+    public void save(Movie movie) {
+        movieRepository.save(movie);
+    }
+    public void deleteById(Integer id) {
+        movieRepository.deleteById(id);
     }
 }

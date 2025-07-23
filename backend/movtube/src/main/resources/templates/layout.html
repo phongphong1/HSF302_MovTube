@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title ?: 'MovTube - Xem phim online miễn phí'}">
+      MovTube
+    </title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom styles -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+
+    <!-- Additional head content -->
+    <th:block th:fragment="head-content"></th:block>
+  </head>
+  <body class="min-h-screen flex flex-col bg-gray-900 text-white">
+    <!-- Header Fragment -->
+    <th:block th:replace="fragments/header :: header"></th:block>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-16">
+      <div layout:fragment="content">
+        <!-- Page content goes here -->
+      </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+
+    <!-- Scripts -->
+    <script
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+
+    <!-- Additional scripts -->
+    <th:block th:fragment="scripts"></th:block>
+  </body>
+</html>

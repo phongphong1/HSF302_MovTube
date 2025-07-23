@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Quản trị hệ thống</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <th:block layout:fragment="head-content"></th:block>
+</head>
+<body class="bg-gray-900 text-white">
+<div layout:fragment="content">
+    <div class="container mx-auto py-10">
+        <h2 class="text-3xl font-bold mb-8 text-center">Trang quản trị hệ thống</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center">
+                <h3 class="text-xl font-semibold mb-4">Quản lý người dùng</h3>
+                <a th:href="@{/admin/users}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded transition">Danh sách người dùng</a>
+            </div>
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center">
+                <h3 class="text-xl font-semibold mb-4">Quản lý phim</h3>
+                <a th:href="@{/admin/movies}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded transition">Danh sách phim</a>
+            </div>
+        </div>
+        <div class="mt-10 text-center">
+            <a th:href="@{/}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition">&larr; Quay về trang chủ</a>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>
+
